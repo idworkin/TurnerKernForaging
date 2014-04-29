@@ -1,13 +1,12 @@
-Analysis and comparison of larval path-lengths for _Drosophila melanogaster_ (DGRP, rovers and sitters) from Turner et al. 2014. and as collected from the Sokolowski lab
-===========================
+##Analysis and comparison of larval path-lengths for _Drosophila melanogaster_ (DGRP, rovers and sitters) from Turner et al. 2014. and as collected from the Sokolowski lab
 
 Analysis performed by Ian Dworkin
 April 29th 2014
 
-##Introduction
+###Introduction
 The reason for this re-analysis is based upon figure 1 of [Turner et. al. 2014](http://biorxiv.org/content/early/2014/04/20/004325.full-text.pdf+html). It was unclear how the data was modeled, and in particular whether the experimental designed included sufficient blocking to account for the well known effects of environmental (day-to-day) variation on this (and many other) behaviours, as appropriate. Given that the data appears to have been collected using an unbalanced incomplete block design, this can induce some "colinearities" and in particular will confound date and genetic (line) effects, which will then only be partially seperable in any statistical model. In addition the average path lengths for the _Drosophila_ larvae seemed quiet short.
 
-While unpublished the Sokolowski lab has also measured larval foraging pathlengths for most of the same set of [DGRP lines](http://dgrp.gnets.ncsu.edu/). I have analyzed these lines as well in the same manner as the data from Turner et al. This analysis is not at all about the genome wide associations, but simply about assessing sources of variability in measurement for larval path length, and how well correlated measures are.
+While unpublished the Sokolowski lab has also measured larval foraging pathlengths for most of the same set of [DGRP lines](http://dgrp.gnets.ncsu.edu/). I have analyzed these lines as well in the same manner as the data from Turner et al. This analysis is not at all about the genome wide associations, but simply about assessing sources of variability in measurement for larval path length, and how well correlated measures are across labs.
 
 
 Call in R Libraries
@@ -129,7 +128,7 @@ table(tk_path_lengths$Line)
 ```
 
 
-And finally numbers of individuals measured for each line on a given day.
+Finally numbers of individuals measured for each line on a given day.
 
 ```r
 table(tk_path_lengths[, 1:2])
@@ -198,10 +197,10 @@ table(tk_path_lengths[, 1:2])
 ##   3/2/10     0   0   0   0  0  0  0
 ```
 
-Note that for a number of lines, they were only measured on a single day (r, 820, 774, 427, 375,358, 313). Even for other lines often the bulk of measurements are on one day, with only a few on any other day. Given the structure of the blocking, this may lead to confounding of date and line effects. While fitting an appropriate model may help a bit, confounding between these sources of variation will still be present. 
+
+Note that for a number of lines, they were only measured on a single day only (r, 820, 774, 427, 375,358, 313). Even for other lines often the bulk of measurements are on one day, with only a few on any other day. Given the structure of the blocking, this may lead to confounding of date and line effects. While fitting an appropriate model may help a bit, confounding between these sources of variation will still be present, and may have considerable influence on the estimates. 
 
 ### Some simple plots to look at the variation
-
 We can look at variation among lines (not accounting for variation due to date).
 
 ```r
@@ -219,7 +218,7 @@ plot(Distance ~ as.factor(Date), data = tk_path_lengths, las = 2)
 ![plot of chunk boxplot_date](figure/boxplot_date.png) 
 
 
-Not sure if this is as helpful here, but variation for each line across Dates. 
+Not sure if this is as helpful here, but variation for each line across Dates. The plot is a bit messy.
 
 ```r
 bwplot(Distance ~ as.factor(Date) | Line, data = tk_path_lengths, las = 2)
@@ -230,10 +229,11 @@ bwplot(Distance ~ as.factor(Date) | Line, data = tk_path_lengths, las = 2)
 
 ## Mixed models for the DGRP data.
 There are two reasonable mixed models to consider fitting:
-1.  either as a crossed effect (with both line and date as independent random effects that do not co-vary),
-2. Or by nesting, which will be far more difficult to estimate with this data. While I do fit it, I am less certain as to the validity of the estimates.
 
-First I am going to center Temp so estimates are not extrapolating too far out. Then fit the linear mixed model.
+1. Either as a crossed effect (with both line and date as independent random effects that do not co-vary),
+2. Or by nesting (or interaction), which will be far more difficult to estimate with this data. While I do fit it, I am less certain as to the validity of the estimates in this case.
+
+First I am going to center Temp (assay temperature I think) so estimates are not extrapolating too far out. Then fit the linear mixed model.
 
 
 ```r
@@ -285,7 +285,8 @@ dotplot(ranef(mod1, condVar = TRUE), scales = list(x = list(relation = "free")),
 
 ![plot of chunk blup_plot_line](figure/blup_plot_line.png) 
 
-However there as noted before there are some very concerning effects due to Date, and the lack of balance. With respect to the overall variance in date:
+
+However, as I noted before there are some very concerning effects due to Date, and the lack of balance. With respect to the overall variance in date:
 
 
 ```r
@@ -298,7 +299,7 @@ dotplot(ranef(mod1, condVar = TRUE), scales = list(x = list(relation = "free")),
 
 Basically there is almost as much variances across dates as across lines. This would not be a substantial issue (and the model could account for this), if the experiment was appropriately blocked across days. Unfortunately, it will be hard to seperate these sources of variation with this data.
 
-# Some checks on the models (confirming the importance of both Date and Line).
+### Some checks on the models (confirming the importance of both Date and Line).
 
 
 ```r
@@ -311,7 +312,7 @@ mod1_noTemp <- lmer(Distance ~ 1 + (1 | Date) + (1 | Line), data = tk_path_lengt
 ```
 
 
-Model allowing for date to vary with line (essentially an interaction). This is not perfect model, either. This is mostly a double check (and would not be my choice of model).
+Model allowing for date to vary with line (essentially an interaction). This is not perfect model either (mod1 is still the most appropriate). This is mostly a double check (and would not be my choice of model).
 
 
 ```r
@@ -321,6 +322,7 @@ mod2 <- lmer(Distance ~ Temp_c + (1 | Line) + (1 | Date) + (1 | Date:Line),
 
 
 Some plots of these effects. The first examines the `Date:Line` variance.
+
 
 ```r
 dotplot(ranef(mod2, condVar = TRUE), scales = list(x = list(relation = "free")), 
@@ -437,7 +439,7 @@ coef_mod1 <- coef(mod1)
 lines_mod1 <- as.data.frame(coef_mod1$Line[, 1])
 rownames(lines_mod1) <- rownames(coef_mod1$Line)
 
-# confirming that the above coefs are the BLUPs + intercept. Confirmed...
+### confirming that the above coefs are the BLUPs + intercept. Confirmed...
 ranef_mod1 <- ranef(mod1)
 lines_ranef_mod1 <- unlist(ranef_mod1$Line)
 cor(lines_mod1, lines_ranef_mod1)
@@ -457,9 +459,9 @@ plot(lines_mod1[, 1], lines_ranef_mod1, pch = 20)
 
 Compare correlations between the raw line means (which is what I think were used in Turner et al, and the BLUPs).
 
-I double checked that lines are coming into the vectors the same.
+Note: I double checked that lines are coming into the vectors the same.
 
-Keep in mind that a priori we expect these to be highly correlated because of the unbalanced, incomplete blocking experimental design which means date and line variance are somewhat confounded. I am not sure how confounded.
+Keep in mind that _a priori_ we expect these estimates to be highly correlated because of the unbalanced, incomplete blocking experimental design employed, which means date and line variance are confounded to an unknown degree.
 
 
 ```r
@@ -483,7 +485,7 @@ plot(line_means, lines_mod1[, ], pch = 20)
 
 
 ### rough estimates of co-linearity induced by the lack of balance.
-While this will only give me a rough idea of how much colinearity there is between date and Line, it may be useful.
+# While this will only give me a rough idea of how much colinearity there is between date and Line, it may be useful.
 
 
 ```r
@@ -575,11 +577,11 @@ Very high for mod3_lm (which is the same overall structure as the primary model 
 While there is no doubt there is quantitative variation due to line, the estimates here are confounded with Date of collection, and this can not be seperated out perfectly to assess how much is due to each effect. 
 
 
-## Analysis of data collected from the first 40 DGRP lines as phenotyped in the lab of Marla Sokolowski.
+# Analysis of data collected from the first 40 DGRP lines as phenotyped in the lab of Marla Sokolowski.
 
 Some notes: `Pathlengthx2` - values were multiplied by two in excel to account for imageJ digitizing effect. Not sure of details.
 
-Also noote this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively.
+Also noote this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively. I changed these below.
 
 Read in and check data
 
@@ -643,6 +645,12 @@ tail(ms_path_lengths)
 
 ```r
 
+# Change BB to 'r' for rover
+levels(ms_path_lengths$Line)[34] <- "r"
+
+# Change ee to 's' for sitter
+levels(ms_path_lengths$Line)[35] <- "s"
+
 # Checking to see if there is any missing data
 colSums(is.na(ms_path_lengths))
 ```
@@ -654,6 +662,7 @@ colSums(is.na(ms_path_lengths))
 
 
 Looking at the structure of the data with respect to how many samples were phenotyped on a given day of phenotyping (days 1-5).
+
 
 ```r
 table(ms_path_lengths$Day)
@@ -682,7 +691,7 @@ table(ms_path_lengths$Line)
 ##     100      99      98     100      99     100      96     100      98 
 ##     437     486     517     555     639     705     707     712     714 
 ##     100      96     100      95      97      99      99      97      98 
-##     732     765     774     786     799     852      BB      ee unknown 
+##     732     765     774     786     799     852       r       s unknown 
 ##      99      47      98     100      59      99      96      94      96
 ```
 
@@ -704,7 +713,7 @@ table(ms_path_lengths[, c(1, 4)])
 ##   4  18  20  20  20  20  19  20  20  20  20  19  18  20  20  20  18  20
 ##   5  19  20  20  20  20  20  20  20  20  20  20  20  20  20  20  19  20
 ##    Line
-## Day 427 437 486 517 555 639 705 707 712 714 732 765 774 786 799 852 BB ee
+## Day 427 437 486 517 555 639 705 707 712 714 732 765 774 786 799 852  r  s
 ##   1  20  20  17  20  20  17  19  20  19  19  20  20  20  20  20  20 20 20
 ##   2  20  20  20  20  20  20  20  19  19  20  20  10  19  20  20  19 19 19
 ##   3  20  20  20  20  20  20  20  20  20  20  20   9  20  20  19  20 20 19
@@ -738,10 +747,10 @@ plot(Pathlengthx2 ~ as.factor(Day), data = ms_path_lengths, las = 2, main = "box
 
 ![plot of chunk boxplot_Day_ms](figure/boxplot_Day_ms.png) 
 
+Fairly stable effects from day-to-day.
 
-Fairly stable overall mean.
 
-How much variation is there for each line, across days?
+###How much variation is there for each line, across days?
 
 ```r
 bwplot(Pathlengthx2 ~ as.factor(Day) | Line, data = ms_path_lengths, las = 2)
@@ -750,8 +759,8 @@ bwplot(Pathlengthx2 ~ as.factor(Day) | Line, data = ms_path_lengths, las = 2)
 ![plot of chunk bwplot_line_day_ms](figure/bwplot_line_day_ms.png) 
 
 
-## Mixed model analysis of pathlengths measures in the DGRP lines from the Sokolowski lab.
-Fitting the same model as described above (without temperature as that was not measured).
+### Mixed model analysis of pathlengths measured (DGRP lines) in the Sokolowski lab.
+Fitting the same model as described above for Turner et. al. (without temperature as that was not measured).
 
 
 ```r
@@ -783,12 +792,12 @@ summary(ms_mod1)
 ```
 
 
-Some notable differences, in both Line and Day-to-Day variance as compared to the data discussed above. As these were measured on 5 consecutive days this seems reasonable. Also, the Sokolowski lab has a very standardized procedure for measuring larval path lengths, which may contribute to this. I am unaware of the technical details in measuring these though, as I did not participate.
+Some notable differences, in both Line and day-to-day variance as compared to the data discussed above measured in Turner et. al. As the data measured in the Sokolowski lab were measured on 5 consecutive days this seems reasonable. Also, the Sokolowski lab has a very standardized procedure for measuring larval path lengths, which may contribute to this. I am unaware of the technical details in measuring these particular data, as I did not participate.
 
-The other point to make note of is that the overall average path lengths is about twice as long in the Sokolowski lab. compare 5.3589 from the data collected in the Sokolowski lab  to 2.0709 as collected by [Turner et al.](http://biorxiv.org/content/early/2014/04/20/004325.full-text.pdf+html). It is worth noting that previously published path lengths tend to be longer. For example see [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009) for a set of inbred lines also collected in North Carolina.
+The other point to make note of is that the overall average path lengths is about twice as long in the Sokolowski lab. compare 5.3589 from the data collected in the Sokolowski lab  to 2.0709 as collected by [Turner et al.](http://biorxiv.org/content/early/2014/04/20/004325.full-text.pdf+html). It is worth noting that previously published path lengths tend to be on the longer side. For example see [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009) for a set of inbred lines also collected in North Carolina.
 
 The BLUPs for the DGRP lines as measured in the Sokolowski lab. 
-BB is rover (r) and ee is sitter (s).
+Note: rover=r and sitter=s.
 
 Here is the variation across lines.
 
@@ -797,6 +806,8 @@ dotplot(ranef(ms_mod1, condVar = TRUE), strip = FALSE, scales = list(x = list(re
 ```
 
 ![plot of chunk plots_blups1_ms](figure/plots_blups1_ms.png) 
+
+Showing considerable line to line variation, but all of it less that _rovers_, and mostly less than _sitters_ as well.
 
 Here is the variation across days.
 
@@ -810,8 +821,8 @@ dotplot(ranef(ms_mod1, condVar = TRUE), strip = FALSE, scales = list(x = list(re
 This shows similar patterns of quantitative variation for path lengths to previously published sets of lines, like [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009), but somewhat inconsistent with the measures from the same DGRP lines as discussed above. There are some lines that are not shared between each set though. 
 
 
-### Examine the degree of induced colinearity because of imbalance. 
-Same issues with measure this inbalance (through co-linearity applies here). If someone knows some better approaches for examining the effects of imbalance in randome effect models (in terms of colinearity), please let me know.
+### Examine the degree of induced colinearity caused by any imbalance. 
+Same issues with measuring the potential for confounding effects due to inbalance. If someone knows some better approaches for examining the effects of imbalance in randome effect models (in terms of colinearity), please let me know.
 
 
 ```r
@@ -835,7 +846,7 @@ car::vif(ms_mod1_lm)
 ```
 
 
-Variance inflation factor across comparable models is much smaller for this set of measures.
+Variance inflation factor across comparable models is much smaller for this set of measures as compared to the estimates I generated based on the data in Turner et al.
 
 ## Comparing blups and raw line means between the data collected in the Turner/Kern labs and the Sokolowski lab
 
@@ -848,9 +859,6 @@ colnames(ms_line) <- "blup"
 
 line_names <- as.character(rownames(ms_line))
 
-rownames(ms_line)[34] <- "r"
-rownames(ms_line)[35] <- "s"
-
 ms_line <- as.data.frame(cbind(ms_line, line_names))
 tt_line <- as.data.frame(cbind(lines_mod1, names = rownames(lines_mod1)))
 
@@ -858,7 +866,7 @@ merged_data <- merge(ms_line, lines_mod1, by = "row.names")
 ```
 
 
-Comparing the adjusted estimates from both sets of measures.
+### Comparing the adjusted estimates from both sets of measures.
 
 
 ```r
@@ -889,7 +897,7 @@ cor.test(x = merged_data[, 2], y = merged_data[, 4])
 ```
 
 
-I double checked these results using the straight up line means as measured in both labs.
+#### I double checked these results using the straight up line means as measured in both labs.
 
 
 ```r
@@ -897,8 +905,6 @@ tt_line_means <- tapply(tk_path_lengths$Distance, INDEX = tk_path_lengths$Line,
     FUN = mean)
 ms_line_means <- tapply(ms_path_lengths$Pathlengthx2, INDEX = ms_path_lengths$Line, 
     FUN = mean)
-rownames(ms_line_means)[34] <- "r"
-rownames(ms_line_means)[35] <- "s"
 
 merged_line_means <- merge(tt_line_means, ms_line_means, by = "row.names")
 cor.test(merged_line_means[, 2], merged_line_means[, 3])
@@ -927,4 +933,4 @@ plot(merged_line_means[, c(3, 2)], pch = 20, main = "Correlation of line means (
 ![plot of chunk compare_line_means_across](figure/compare_line_means_across.png) 
 
     
-Based on these analyses, it is not clear to me whether the pathlengths measured in the two labs are directly comparable.  
+Based on these analyses, it is not clear whether the pathlengths measured in the two labs are directly comparable.  

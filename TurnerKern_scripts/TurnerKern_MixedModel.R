@@ -102,7 +102,7 @@ coef_mod1 <- coef(mod1)
 lines_mod1 <- as.data.frame(coef_mod1$Line[,1])
 rownames(lines_mod1) <- rownames(coef_mod1$Line)
 
-# confirming that the above coefs are the BLUPs + intercept. Confirmed...
+### confirming that the above coefs are the BLUPs + intercept. Confirmed...
 ranef_mod1 <- ranef(mod1)
 lines_ranef_mod1 <- unlist(ranef_mod1$Line)
 cor(lines_mod1, lines_ranef_mod1)
@@ -152,6 +152,12 @@ summary(ms_path_lengths)
 str(ms_path_lengths)
 head(ms_path_lengths)
 tail(ms_path_lengths)
+
+# Change BB to 'r' for rover
+levels(ms_path_lengths$Line)[34] <- "r"
+
+#Change ee to 's' for sitter
+levels(ms_path_lengths$Line)[35] <- "s"
 
 # Checking to see if there is any missing data
 colSums(is.na(ms_path_lengths))
@@ -215,9 +221,6 @@ colnames(ms_line) <- "blup"
 
 line_names <- as.character(rownames(ms_line))
 
-rownames(ms_line)[34] <- "r"
-rownames(ms_line)[35] <- "s"
-
 ms_line <- as.data.frame(cbind(ms_line, line_names))
 tt_line <- as.data.frame(cbind(lines_mod1, names =rownames(lines_mod1)))
 
@@ -235,8 +238,6 @@ cor.test(x=merged_data[,2], y=merged_data[,4])
 ## ----compare_line_means_across-------------------------------------------
 tt_line_means <- tapply(tk_path_lengths$Distance, INDEX=tk_path_lengths$Line, FUN=mean)
 ms_line_means <- tapply(ms_path_lengths$Pathlengthx2, INDEX=ms_path_lengths$Line, FUN=mean)
-rownames(ms_line_means)[34] <- "r"
-rownames(ms_line_means)[35] <- "s"
 
 merged_line_means <- merge(tt_line_means, ms_line_means, by="row.names")
 cor.test(merged_line_means[,2], merged_line_means[,3])
