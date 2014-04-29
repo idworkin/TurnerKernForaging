@@ -485,7 +485,8 @@ plot(line_means, lines_mod1[, ], pch = 20)
 
 
 ### rough estimates of co-linearity induced by the lack of balance.
-# While this will only give me a rough idea of how much colinearity there is between date and Line, it may be useful.
+ 
+While this will only give me a rough idea of how much colinearity there is between date and Line, it may be useful.
 
 
 ```r
