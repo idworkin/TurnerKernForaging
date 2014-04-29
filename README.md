@@ -1,9 +1,9 @@
 This repository contains some analyses of the data reported in both [Turner et al. 2014](http://biorxiv.org/content/early/2014/04/20/004325) 
-and independent measurements of the same set of _Drosophila melanogaster_ lines (DGRP) from the [Sokolowski lab](http://sokolowski.eeb.utoronto.ca/). 
+and independent measurements of the same set of _Drosophila melanogaster_ lines (DGRP) measured in the [Sokolowski lab](http://sokolowski.eeb.utoronto.ca/). 
 
-The phenotype in question is larval pathlength for larvae on a plate of thin yeast paste as a measure of larval foraging behaviour.
+The phenotype in question is larval path-length for _Drosophila_ larvae on a plate of thin yeast paste as a measure of larval foraging behaviour.
 
-Given the somewhat controversial nature of the conclusions found in Turner et. al., I will allow my re-analyses of both datasets (again, largely on the same set of lines) to speak for itself.
+Given the controversial nature of the conclusions found in Turner et. al., I will allow my re-analyses of both datasets (again, largely on the same set of lines) to provide context for interested parties to come to their own conclusions.
 More importantly, all data and scripts are available in this repository for additional analyses. If you do find any errors in my analyses, please let me know.
 
 1. If you want to just follow the analysis itself, I recommend going to the [markdown](https://github.com/idworkin/TurnerKernForaging/blob/master/TurnerKern_scripts/TurnerKern_MixedModel.md) page which has both all of the code for the analysis, output and figures, and my limited set of conclusions.
