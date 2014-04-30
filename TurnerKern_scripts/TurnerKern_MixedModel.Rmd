@@ -224,9 +224,8 @@ While there is no doubt there is quantitative variation due to line, the estimat
 
 # Analysis of data collected from the first 40 DGRP lines as phenotyped in the lab of Marla Sokolowski.
 
-Some notes: `Pathlengthx2` - values were multiplied by two in excel to account for imageJ digitizing effect. Not sure of details.
 
-Also noote this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively. I changed these below.
+Note this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively. I changed these below.
 
 Read in and check data
 ```{r read_check_ms}
@@ -272,12 +271,12 @@ A few empty cells, but besides those it is pretty good.
 ### Some simple plots
 
 ```{r boxplot_line_ms}
-plot(Pathlengthx2 ~ Line, data=ms_path_lengths, las=2, 
+plot(Pathlength ~ Line, data=ms_path_lengths, las=2, 
     main="boxplot of path lengths for each line, unadjusted")
 ```
 
 ```{r boxplot_Day_ms}    
-plot(Pathlengthx2 ~ as.factor(Day), data=ms_path_lengths, las=2,
+plot(Pathlength ~ as.factor(Day), data=ms_path_lengths, las=2,
     main="boxplot of path lengths for each Day, unadjusted")
 ```    
 Fairly stable effects from day-to-day.
@@ -285,14 +284,14 @@ Fairly stable effects from day-to-day.
 
 ###How much variation is there for each line, across days?
 ```{r bwplot_line_day_ms}
-bwplot(Pathlengthx2 ~ as.factor(Day)|Line, data=ms_path_lengths, las=2)
+bwplot(Pathlength ~ as.factor(Day)|Line, data=ms_path_lengths, las=2)
 ```
 
 ### Mixed model analysis of pathlengths measured (DGRP lines) in the Sokolowski lab.
 Fitting the same model as described above for Turner et. al. (without temperature as that was not measured).
 
 ```{r mod1_ms}
-ms_mod1 <- lmer(Pathlengthx2 ~ 1 + (1|Day) + (1|Line), data=ms_path_lengths, REML=TRUE)
+ms_mod1 <- lmer(Pathlength ~ 1 + (1|Day) + (1|Line), data=ms_path_lengths, REML=TRUE)
 
 # Let's look at some summaries.
 summary(ms_mod1)
@@ -318,14 +317,14 @@ dotplot(ranef(ms_mod1,condVar=TRUE), strip=FALSE,
               scales = list(x = list(relation = 'free')))[["Day"]]
 ```
               
-This shows similar patterns of quantitative variation for path lengths to previously published sets of lines, like [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009), but somewhat inconsistent with the measures from the same DGRP lines as discussed above. There are some lines that are not shared between each set though. 
+This shows similar patterns of quantitative variation for path lengths to previously published sets of lines, like [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009), but somewhat inconsistent with the measures from the same DGRP lines measured by Turner as discussed above. There are a few lines not shared between each set. 
 
 
 ### Examine the degree of induced colinearity caused by any imbalance. 
 Same issues with measuring the potential for confounding effects due to inbalance. If someone knows some better approaches for examining the effects of imbalance in randome effect models (in terms of colinearity), please let me know.
 
 ```{r colinearity_ms}
-ms_mod1_lm <- lm(Pathlengthx2 ~ 1 + as.factor(Day) + Line, data=ms_path_lengths)
+ms_mod1_lm <- lm(Pathlength ~ 1 + as.factor(Day) + Line, data=ms_path_lengths)
 
 ConditionNumber(ms_mod1_lm)
 car::vif(ms_mod1_lm) 
@@ -363,7 +362,7 @@ cor.test(x=merged_data[,2], y=merged_data[,4])
 
 ```{r compare_line_means_across}
 tt_line_means <- tapply(tk_path_lengths$Distance, INDEX=tk_path_lengths$Line, FUN=mean)
-ms_line_means <- tapply(ms_path_lengths$Pathlengthx2, INDEX=ms_path_lengths$Line, FUN=mean)
+ms_line_means <- tapply(ms_path_lengths$Pathlength, INDEX=ms_path_lengths$Line, FUN=mean)
 
 merged_line_means <- merge(tt_line_means, ms_line_means, by="row.names")
 cor.test(merged_line_means[,2], merged_line_means[,3])
@@ -372,5 +371,8 @@ plot(merged_line_means[,c(3,2)], pch=20,
     main="Correlation of line means (unadjusted) for DGRP lines as measured across two labs",
     xlab="Sokolowski", ylab="Turner_Kern")
 ```
-    
-Based on these analyses, it is not clear whether the pathlengths measured in the two labs are directly comparable.  
+Based on my analyses of these data, I do not think it is likely that the pathlengths measured by Turner et al. are really measuring the same phenotype as reported in the literature. This is based largely on two findings. First that the pathlengths reported in Turner et al. are approximately half the length as found for the same set of lines as measured in the Sokolowski lab, and also widely reported in the literature. Second the estimates from the Turner et al. data are at best only moderatedly correlated (~0.47), for the same set of lines as also measured in the Sokolowski lab. While the argument could be viewed as circular, it is clear that the Sokolowski lab has a great deal of expertise in phenotyping larval pathlengths.
+
+The finding that in the Turner et al. data that the _rover_ lines do not have a particularly extreme phenotype relative to the DGRP lines is troubling in the context of it showing a very different pattern as compared to the Sokolowski measures (for _rover_ and the DGRP) where _rover_ is quite extreme. The results from my analysis of the Sokolowski data of the DGRP and _rover_ and _sitter_ and consistent with previous comparisons with other inbred lines derived from natural populations in North Carolina (Reed et al. 2010.)
+
+Finally, the lack of balance in the experimental design of Turner et. al. does mean that the blocking (Date) and genetic (line) variances are confounded, and can not be partitioned appropriately. Thus any estimates based on these data need to viewed with caution, in terms of estimates, heritability and downstream use such as the genome wide associations.  

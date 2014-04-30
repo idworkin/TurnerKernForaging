@@ -176,21 +176,21 @@ table(ms_path_lengths[,c(1,4)])
 
 
 ## ----boxplot_line_ms-----------------------------------------------------
-plot(Pathlengthx2 ~ Line, data=ms_path_lengths, las=2, 
+plot(Pathlength ~ Line, data=ms_path_lengths, las=2, 
     main="boxplot of path lengths for each line, unadjusted")
 
 
 ## ----boxplot_Day_ms------------------------------------------------------
-plot(Pathlengthx2 ~ as.factor(Day), data=ms_path_lengths, las=2,
+plot(Pathlength ~ as.factor(Day), data=ms_path_lengths, las=2,
     main="boxplot of path lengths for each Day, unadjusted")
 
 
 ## ----bwplot_line_day_ms--------------------------------------------------
-bwplot(Pathlengthx2 ~ as.factor(Day)|Line, data=ms_path_lengths, las=2)
+bwplot(Pathlength ~ as.factor(Day)|Line, data=ms_path_lengths, las=2)
 
 
 ## ----mod1_ms-------------------------------------------------------------
-ms_mod1 <- lmer(Pathlengthx2 ~ 1 + (1|Day) + (1|Line), data=ms_path_lengths, REML=TRUE)
+ms_mod1 <- lmer(Pathlength ~ 1 + (1|Day) + (1|Line), data=ms_path_lengths, REML=TRUE)
 
 # Let's look at some summaries.
 summary(ms_mod1)
@@ -207,7 +207,7 @@ dotplot(ranef(ms_mod1,condVar=TRUE), strip=FALSE,
 
 
 ## ----colinearity_ms------------------------------------------------------
-ms_mod1_lm <- lm(Pathlengthx2 ~ 1 + as.factor(Day) + Line, data=ms_path_lengths)
+ms_mod1_lm <- lm(Pathlength ~ 1 + as.factor(Day) + Line, data=ms_path_lengths)
 
 ConditionNumber(ms_mod1_lm)
 car::vif(ms_mod1_lm) 
@@ -237,7 +237,7 @@ cor.test(x=merged_data[,2], y=merged_data[,4])
 
 ## ----compare_line_means_across-------------------------------------------
 tt_line_means <- tapply(tk_path_lengths$Distance, INDEX=tk_path_lengths$Line, FUN=mean)
-ms_line_means <- tapply(ms_path_lengths$Pathlengthx2, INDEX=ms_path_lengths$Line, FUN=mean)
+ms_line_means <- tapply(ms_path_lengths$Pathlength, INDEX=ms_path_lengths$Line, FUN=mean)
 
 merged_line_means <- merge(tt_line_means, ms_line_means, by="row.names")
 cor.test(merged_line_means[,2], merged_line_means[,3])

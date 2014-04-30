@@ -580,9 +580,8 @@ While there is no doubt there is quantitative variation due to line, the estimat
 
 # Analysis of data collected from the first 40 DGRP lines as phenotyped in the lab of Marla Sokolowski.
 
-Some notes: `Pathlengthx2` - values were multiplied by two in excel to account for imageJ digitizing effect. Not sure of details.
 
-Also noote this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively. I changed these below.
+Note this data used the internal Sokolowski lab nomenclature (`BB` and `ee`) for rover and sitter respectively. I changed these below.
 
 Read in and check data
 
@@ -594,7 +593,7 @@ summary(ms_path_lengths)
 ```
 
 ```
-##       Day           Strain      Pathlengthx2         Line     
+##       Day           Strain       Pathlength          Line     
 ##  Min.   :1.00   25176  : 100   Min.   : 0.024   303    : 100  
 ##  1st Qu.:2.00   25177  : 100   1st Qu.: 3.438   304    : 100  
 ##  Median :3.00   25179  : 100   Median : 5.263   307    : 100  
@@ -610,10 +609,10 @@ str(ms_path_lengths)
 
 ```
 ## 'data.frame':	3450 obs. of  4 variables:
-##  $ Day         : int  1 1 1 1 1 1 1 1 1 1 ...
-##  $ Strain      : Factor w/ 36 levels "25174","25175",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ Pathlengthx2: num  11.45 11.06 5.54 6.85 6.22 ...
-##  $ Line        : Factor w/ 36 levels "208","301","303",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Day       : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Strain    : Factor w/ 36 levels "25174","25175",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Pathlength: num  11.45 11.06 5.54 6.85 6.22 ...
+##  $ Line      : Factor w/ 36 levels "208","301","303",..: 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
 ```r
@@ -621,13 +620,13 @@ head(ms_path_lengths)
 ```
 
 ```
-##   Day Strain Pathlengthx2 Line
-## 1   1  25174       11.452  208
-## 2   1  25174       11.064  208
-## 3   1  25174        5.544  208
-## 4   1  25174        6.852  208
-## 5   1  25174        6.218  208
-## 6   1  25174        5.106  208
+##   Day Strain Pathlength Line
+## 1   1  25174     11.452  208
+## 2   1  25174     11.064  208
+## 3   1  25174      5.544  208
+## 4   1  25174      6.852  208
+## 5   1  25174      6.218  208
+## 6   1  25174      5.106  208
 ```
 
 ```r
@@ -635,13 +634,13 @@ tail(ms_path_lengths)
 ```
 
 ```
-##      Day Strain Pathlengthx2 Line
-## 3445   5     ee        6.842   ee
-## 3446   5     ee       13.132   ee
-## 3447   5     ee        8.202   ee
-## 3448   5     ee        5.156   ee
-## 3449   5     ee       10.098   ee
-## 3450   5     ee        9.268   ee
+##      Day Strain Pathlength Line
+## 3445   5     ee      6.842   ee
+## 3446   5     ee     13.132   ee
+## 3447   5     ee      8.202   ee
+## 3448   5     ee      5.156   ee
+## 3449   5     ee     10.098   ee
+## 3450   5     ee      9.268   ee
 ```
 
 ```r
@@ -657,8 +656,8 @@ colSums(is.na(ms_path_lengths))
 ```
 
 ```
-##          Day       Strain Pathlengthx2         Line 
-##            0            0            0            0
+##        Day     Strain Pathlength       Line 
+##          0          0          0          0
 ```
 
 
@@ -735,7 +734,7 @@ A few empty cells, but besides those it is pretty good.
 
 
 ```r
-plot(Pathlengthx2 ~ Line, data = ms_path_lengths, las = 2, main = "boxplot of path lengths for each line, unadjusted")
+plot(Pathlength ~ Line, data = ms_path_lengths, las = 2, main = "boxplot of path lengths for each line, unadjusted")
 ```
 
 ![plot of chunk boxplot_line_ms](figure/boxplot_line_ms.png) 
@@ -743,7 +742,7 @@ plot(Pathlengthx2 ~ Line, data = ms_path_lengths, las = 2, main = "boxplot of pa
 
 
 ```r
-plot(Pathlengthx2 ~ as.factor(Day), data = ms_path_lengths, las = 2, main = "boxplot of path lengths for each Day, unadjusted")
+plot(Pathlength ~ as.factor(Day), data = ms_path_lengths, las = 2, main = "boxplot of path lengths for each Day, unadjusted")
 ```
 
 ![plot of chunk boxplot_Day_ms](figure/boxplot_Day_ms.png) 
@@ -754,7 +753,7 @@ Fairly stable effects from day-to-day.
 ###How much variation is there for each line, across days?
 
 ```r
-bwplot(Pathlengthx2 ~ as.factor(Day) | Line, data = ms_path_lengths, las = 2)
+bwplot(Pathlength ~ as.factor(Day) | Line, data = ms_path_lengths, las = 2)
 ```
 
 ![plot of chunk bwplot_line_day_ms](figure/bwplot_line_day_ms.png) 
@@ -765,7 +764,7 @@ Fitting the same model as described above for Turner et. al. (without temperatur
 
 
 ```r
-ms_mod1 <- lmer(Pathlengthx2 ~ 1 + (1 | Day) + (1 | Line), data = ms_path_lengths, 
+ms_mod1 <- lmer(Pathlength ~ 1 + (1 | Day) + (1 | Line), data = ms_path_lengths, 
     REML = TRUE)
 
 # Let's look at some summaries.
@@ -775,7 +774,7 @@ summary(ms_mod1)
 ```
 ## called print.summary.merMod
 ## Linear mixed model fit by REML ['lmerMod']
-## Formula: Pathlengthx2 ~ 1 + (1 | Day) + (1 | Line) 
+## Formula: Pathlength ~ 1 + (1 | Day) + (1 | Line) 
 ##    Data: ms_path_lengths 
 ## 
 ## REML criterion at convergence: 15028 
@@ -819,7 +818,7 @@ dotplot(ranef(ms_mod1, condVar = TRUE), strip = FALSE, scales = list(x = list(re
 ![plot of chunk plots_blups2_ms](figure/plots_blups2_ms.png) 
 
               
-This shows similar patterns of quantitative variation for path lengths to previously published sets of lines, like [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009), but somewhat inconsistent with the measures from the same DGRP lines as discussed above. There are some lines that are not shared between each set though. 
+This shows similar patterns of quantitative variation for path lengths to previously published sets of lines, like [Reed et. al. 2010 figure 1F](http://www.genetics.org/content/185/3/1009), but somewhat inconsistent with the measures from the same DGRP lines measured by Turner as discussed above. There are a few lines not shared between each set. 
 
 
 ### Examine the degree of induced colinearity caused by any imbalance. 
@@ -827,7 +826,7 @@ Same issues with measuring the potential for confounding effects due to inbalanc
 
 
 ```r
-ms_mod1_lm <- lm(Pathlengthx2 ~ 1 + as.factor(Day) + Line, data = ms_path_lengths)
+ms_mod1_lm <- lm(Pathlength ~ 1 + as.factor(Day) + Line, data = ms_path_lengths)
 
 ConditionNumber(ms_mod1_lm)
 ```
@@ -904,7 +903,7 @@ cor.test(x = merged_data[, 2], y = merged_data[, 4])
 ```r
 tt_line_means <- tapply(tk_path_lengths$Distance, INDEX = tk_path_lengths$Line, 
     FUN = mean)
-ms_line_means <- tapply(ms_path_lengths$Pathlengthx2, INDEX = ms_path_lengths$Line, 
+ms_line_means <- tapply(ms_path_lengths$Pathlength, INDEX = ms_path_lengths$Line, 
     FUN = mean)
 
 merged_line_means <- merge(tt_line_means, ms_line_means, by = "row.names")
@@ -933,5 +932,8 @@ plot(merged_line_means[, c(3, 2)], pch = 20, main = "Correlation of line means (
 
 ![plot of chunk compare_line_means_across](figure/compare_line_means_across.png) 
 
-    
-Based on these analyses, it is not clear whether the pathlengths measured in the two labs are directly comparable.  
+Based on my analyses of these data, I do not think it is likely that the pathlengths measured by Turner et al. are really measuring the same phenotype as reported in the literature. This is based largely on two findings. First that the pathlengths reported in Turner et al. are approximately half the length as found for the same set of lines as measured in the Sokolowski lab, and also widely reported in the literature. Second the estimates from the Turner et al. data are at best only moderatedly correlated (~0.47), for the same set of lines as also measured in the Sokolowski lab. While the argument could be viewed as circular, it is clear that the Sokolowski lab has a great deal of expertise in phenotyping larval pathlengths.
+
+The finding that in the Turner et al. data that the _rover_ lines do not have a particularly extreme phenotype relative to the DGRP lines is troubling in the context of it showing a very different pattern as compared to the Sokolowski measures (for _rover_ and the DGRP) where _rover_ is quite extreme. The results from my analysis of the Sokolowski data of the DGRP and _rover_ and _sitter_ and consistent with previous comparisons with other inbred lines derived from natural populations in North Carolina (Reed et al. 2010.)
+
+Finally, the lack of balance in the experimental design of Turner et. al. does mean that the blocking (Date) and genetic (line) variances are confounded, and can not be partitioned appropriately. Thus any estimates based on these data need to viewed with caution, in terms of estimates, heritability and downstream use such as the genome wide associations.  
